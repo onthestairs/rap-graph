@@ -15,8 +15,26 @@
    url-name))
 
 (defn find-artists [url]
-  (let [page (get-page url)
-        original-artist (url-name url)]
+  (let [page (get-page url)]
     (set (map extract-artist
               (html/select page #{[:div.featured_artists :a]
                                   [:h1.song_title :a]})))))
+
+(defn artist-url [artist]
+  (str "http://rapgenius.com/artists/" artist))
+
+(defn song-url [song]
+  (str "http://rapgenius.com" song))
+
+(defn extract-song [song-html]
+  (let [url (:href (:attrs song-html))]
+    (song-url url)))
+
+(defn find-songs [artist-page]
+  (map extract-song (html/select artist-page [:ul.song_list :a])))
+
+(defn top-songs [artist]
+  (let [url (artist-url artist)
+        page (get-page url)
+        songs (find-songs page)]
+    songs))
