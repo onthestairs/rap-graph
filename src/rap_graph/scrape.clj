@@ -23,9 +23,12 @@
 (defn artist-url [artist]
   (str "http://rapgenius.com/artists/" artist))
 
-(def extract-song [song-html]
+(defn song-url [song]
+  (str "http://rapgenius.com" song))
+
+(defn extract-song [song-html]
   (let [url (:href (:attrs song-html))]
-    url))
+    (song-url url)))
 
 (defn find-songs [artist-page]
   (map extract-song (html/select artist-page [:ul.song_list :a])))
@@ -33,5 +36,5 @@
 (defn top-songs [artist]
   (let [url (artist-url artist)
         page (get-page url)
-        songs (find-songs)]
+        songs (find-songs page)]
     songs))
