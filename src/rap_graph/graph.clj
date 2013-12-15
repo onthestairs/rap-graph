@@ -17,34 +17,38 @@
 
 (def infinity (java.lang.Integer/MAX_VALUE))
 
-(defn smallest-distance [distances nodes]
+(defn smallest-length [distances nodes]
   (apply min-key
          (fn [node] (if (contains? distances node)
-                     (distances node)
+                     ((distances node) :length)
                      infinity))
          nodes))
 
-(defn update-distances [distances distance nodes]
-  (reduce (fn [distances node]
-            (if (contains? distances node)
-              distances
-              (assoc distances node distance)))
-          distances
-          nodes))
+(defn update-paths [paths path nodes]
+  (let [route (path :route)
+        length (inc (path :length))]
+    (reduce (fn [paths node]
+              (if (contains? paths node)
+                paths
+                (assoc paths node {:length length
+                                   :route (conj route node)})))
+            paths
+            nodes)))
 
 (defn dijkstra [graph node-1]
-  (loop [distances {node-1 0}
+  (loop [paths {node-1 {:length 0
+                        :route [node-1]}}
          unvisited (set (keys graph))]
     (if (empty? unvisited)
-      distances
-      (let [current-node (smallest-distance distances unvisited)]
-        (if (not (contains? distances current-node))
-          distances
-          (let [current-distance (distances current-node)
+      paths
+      (let [current-node (smallest-length paths unvisited)]
+        (if (not (contains? paths current-node))
+          paths
+          (let [current-path (paths current-node)
                 current-neighbours (get-node graph current-node)
-                new-distances (update-distances distances (inc current-distance) current-neighbours)
+                new-paths (update-paths paths current-path current-neighbours)
                 new-unvisited (disj unvisited current-node)]
-            (recur new-distances
+            (recur new-paths
                    new-unvisited)))))))
 
 (defn all-distances [graph]
