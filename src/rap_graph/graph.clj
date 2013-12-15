@@ -15,17 +15,6 @@
         new-node-2 (add-node-edge node-2 node-1-name)]
     (assoc graph node-1-name new-node-1 node-2-name new-node-2)))
 
-;; (defn dijkstra [graph node-1 node-2]
-;;   (loop [distances {}
-;;          to-check [node-1]
-;;          length 0]
-;;     (let [to-check 
-;;           increase-distance-fns (map (fn [distances node]
-;;                                        (if-not (contains? distances node)
-;;                                          (assoc distances (inc length)))) to-check)
-;;           ])
-;;     ))
-
 (def infinity (java.lang.Integer/MAX_VALUE))
 
 (defn smallest-distance [distances nodes]
@@ -50,11 +39,19 @@
       distances
       (let [current-node (smallest-distance distances unvisited)]
         (if (not (contains? distances current-node))
-          (do (println "ARGHHHH") distances)
+          distances
           (let [current-distance (distances current-node)
                 current-neighbours (get-node graph current-node)
                 new-distances (update-distances distances (inc current-distance) current-neighbours)
                 new-unvisited (disj unvisited current-node)]
-            (println new-distances)
             (recur new-distances
                    new-unvisited)))))))
+
+(defn all-distances [graph]
+  (let [nodes (keys graph)]
+    (zipmap nodes
+            (map (fn [node] (println "Doing" node) (dijkstra graph node))
+                 nodes))))
+
+(defn distance [distances node-1 node-2]
+  ((distances node-1) node-2))
