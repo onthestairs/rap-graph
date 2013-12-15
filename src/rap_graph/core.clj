@@ -4,14 +4,12 @@
             [clojure.math.combinatorics :as combo]
             [clojure.core.async :refer [go chan timeout >! alts!! close!]]))
 
-(defn create-add-edge-fn [artist-1 artist-2]
-  (fn [graph] (g/add-edge graph artist-1 artist-2)))
-
 (defn add-scrape-to-graph [graph artists]
-  (let [add-edge-fns (map (fn [[artist-1 artist-2]] (create-add-edge-fn artist-1 artist-2))
-                          (combo/combinations artists 2))
-        add-edges (apply comp add-edge-fns)]
-    (add-edges graph)))
+  (let [artist-combinations (combo/combinations artists 2)]
+    (reduce (fn [graph [artist-1 artist-2]]
+              (g/add-edge graph artist-1 artist-2))
+            graph
+            artist-combinations)))
 
 (defn crawl [seed-artist depth ch]
   (def artists-seen (atom #{}))
