@@ -13,34 +13,35 @@
         add-edges (apply comp add-edge-fns)]
     (add-edges graph)))
 
-(def artists-seen (atom #{}))
+(defn crawl [seed-artist depth ch]
+  (def artists-seen (atom #{}))
+  (letfn [(crawl-artist [artist depth ch]
+            (println artist)
+            (swap! artists-seen conj artist)
+            (go (let [songs (scrape/top-songs artist)]
+                  (doseq [song songs]
+                    (crawl-song song depth ch)))))
+          (crawl-song [url depth ch]
+            (go (let [artists (scrape/find-artists url)]
+                  (>! ch artists)
+                  (doseq [artist artists]
+                    (when (and (pos? depth) (not (contains? @artists-seen artist)))
+                      (crawl-artist artist (dec depth) ch)))
+                  )))]
+    (crawl-artist seed-artist depth ch)))
 
-(defn crawl-song [url depth ch]
-  (go (let [artists (scrape/find-artists url)]
-        (>! ch artists)
-        (doseq [artist artists]
-          (when (and (pos? depth) (not (contains? @artists-seen artist)))
-            (crawl-artist artist (dec depth) ch)))
-        )))
-
-(defn crawl-artist [artist depth ch]
-  (swap! artists-seen conj artist)
-  (go (let [songs (take 3 (scrape/top-songs artist))]
-        (doseq [song songs]
-          (crawl-song song depth ch)))))
-
-(defn make-graph [seed-artist]
+(defn make-graph [seed-artist depth]
   (def g (atom {}))
   (let [ch (chan)]
-    (crawl-artist seed-artist 1 ch)
+    (crawl seed-artist depth ch)
     (loop []
       (let [tmo (timeout 10000)
             [msg chan] (alts!! [tmo ch])]
         (if (= chan tmo)
-          (println "done")
+          (do (close! ch)
+              (println "Finished"))
           (do
             (swap! g add-scrape-to-graph msg)
-            (println g)
+            ;(println g)
             (recur)))))
-    (close! ch)
-    g))
+    @g))

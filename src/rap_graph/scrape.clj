@@ -2,7 +2,7 @@
   (:require [net.cgrand.enlive-html :as html]))
 
 (defn get-page [url]
-  (println "Scraping" url "...")
+  ;(println "Scraping" url "...")
   (html/html-resource (java.net.URL. url)))
 
 (defn url-name [url]
@@ -30,8 +30,14 @@
   (let [url (:href (:attrs song-html))]
     (song-url url)))
 
+(defn is-collab? [song]
+  (let [text (html/text song)]
+    (.contains text "Ft")))
+
 (defn find-songs [artist-page]
-  (map extract-song (html/select artist-page [:ul.song_list :a])))
+  (let [songs (html/select artist-page [:ul.song_list :a])
+        collab-songs (filter is-collab? songs)]
+    (map extract-song collab-songs)))
 
 (defn top-songs [artist]
   (let [url (artist-url artist)
