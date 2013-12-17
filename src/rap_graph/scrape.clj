@@ -30,14 +30,37 @@
   (let [url (:href (:attrs song-html))]
     (song-url url)))
 
-(defn is-collab? [song]
-  (let [text (html/text song)]
-    (.contains text "Ft")))
+(defn is-collab? [artist song]
+  (let [text (html/text song)
+        url (:href (:attrs song))]
+    (or (.contains text "Ft")
+        (not (.startsWith url (str "/" artist))))))
 
-(defn find-songs [artist-page]
-  (let [songs (html/select artist-page [:ul.song_list :a])
-        collab-songs (filter is-collab? songs)]
-    (map extract-song collab-songs)))
+(defn artist-songs-url [artist id page]
+  (str "http://rapgenius.com/songs?for_artist_page=" id "&id=" artist "&lyrics_seo=false&page=" page "&pagination=true&search%5Bby_artist%5D=" id "&search%5Bunexplained_songs_last%5D%5B%5D=title&search%5Bunexplained_songs_last%5D%5B%5D=id"))
+
+(defn find-artist-id [artist]
+  (let [url (artist-url artist)
+        page (get-page url)
+        form-element (html/select page [:form.edit_artist])
+        form-action (:action (:attrs (first form-element)))
+        id (url-name form-action)]
+    id))
+
+(defn find-songs [artist]
+  (let [artist-id (find-artist-id artist)]
+    (loop [songs []
+           page-number 1]
+      (let [songs-url (artist-songs-url artist artist-id page-number)
+            songs-page (get-page songs-url)
+            songs-on-page (html/select songs-page [:ul.song_list :a])
+            collab-songs (filter (partial is-collab? artist) songs-on-page)
+            extracted-songs (map extract-song collab-songs)]
+        ;(println songs-on-page)
+        (if (empty? songs-on-page)
+          songs
+          (recur (concat songs extracted-songs)
+                 (inc page-number)))))))
 
 (defn top-songs [artist]
   (let [url (artist-url artist)

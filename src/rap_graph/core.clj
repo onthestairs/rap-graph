@@ -16,7 +16,7 @@
   (letfn [(crawl-artist [artist depth ch]
             (println artist)
             (swap! artists-seen conj artist)
-            (go (let [songs (scrape/top-songs artist)]
+            (go (let [songs (scrape/find-songs artist)]
                   (doseq [song songs]
                     (crawl-song song depth ch)))))
           (crawl-song [url depth ch]
