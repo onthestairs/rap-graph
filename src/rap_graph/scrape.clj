@@ -1,5 +1,6 @@
 (ns rap-graph.scrape
-  (:require [net.cgrand.enlive-html :as html]))
+  (:require [net.cgrand.enlive-html :as html]
+            [clojure.string :as string]))
 
 (defn get-page [url]
   ;(println "Scraping" url "...")
@@ -36,6 +37,13 @@
     (or (.contains text "Ft")
         (not (.startsWith url (str "/" artist))))))
 
+(def illegal-words
+  ["jwmt" "interview" "review"])
+
+(defn is-valid? [song]
+  (let [text (string/lower-case (html/text song))]
+    (not (some (fn [word] (.contains text word)) illegal-words))))
+
 (defn artist-songs-url [artist id page]
   (str "http://rapgenius.com/songs?for_artist_page=" id "&id=" artist "&lyrics_seo=false&page=" page "&pagination=true&search%5Bby_artist%5D=" id "&search%5Bunexplained_songs_last%5D%5B%5D=title&search%5Bunexplained_songs_last%5D%5B%5D=id"))
 
@@ -55,7 +63,8 @@
             songs-page (get-page songs-url)
             songs-on-page (html/select songs-page [:ul.song_list :a])
             collab-songs (filter (partial is-collab? artist) songs-on-page)
-            extracted-songs (map extract-song collab-songs)]
+            valid-songs (filter is-valid? collab-songs)
+            extracted-songs (map extract-song valid-songs)]
         ;(println songs-on-page)
         (if (empty? songs-on-page)
           songs
