@@ -1,0 +1,9 @@
+body {
+    font-family: 'Domine', serif;
+    margin: 50px auto;
+    width: 800px;
+}
+
+a, a:visited {
+   color: black;
+}
