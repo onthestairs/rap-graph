@@ -8,6 +8,7 @@
 
 (defroutes main-routes
   (GET "/path" [from-artist to-artist] (artist-path from-artist to-artist))
+  (GET "/image" [artist] (get-image artist))
   (route/resources "/")
   (route/not-found "Page not found"))
 

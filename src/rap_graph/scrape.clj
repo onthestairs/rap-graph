@@ -3,7 +3,6 @@
             [clojure.string :as string]))
 
 (defn get-page [url]
-  ;(println "Scraping" url "...")
   (html/html-resource (java.net.URL. url)))
 
 (defn url-name [url]
@@ -13,10 +12,12 @@
   (let [name (html/text artist-html)
         url (:href (:attrs artist-html))
         url-name (url-name url)]
-   url-name))
+    {:canonical-name name
+     :rap-genius-name url-name}))
 
-(defn find-artists [url]
-  (let [page (get-page url)]
+(defn find-artists [song]
+  (let [url (:url song)
+        page (get-page url)]
     (set (map extract-artist
               (html/select page #{[:div.featured_artists :a]
                                   [:h1.song_title :a]})))))
@@ -24,12 +25,15 @@
 (defn artist-url [artist]
   (str "http://rapgenius.com/artists/" artist))
 
-(defn song-url [song]
+(defn get-song-url [song]
   (str "http://rapgenius.com" song))
 
 (defn extract-song [song-html]
-  (let [url (:href (:attrs song-html))]
-    (song-url url)))
+  (let [title (string/trim (html/text song-html))
+        url (:href (:attrs song-html))
+        song-url (get-song-url url)]
+    {:title title
+     :url song-url}))
 
 (defn is-collab? [artist song]
   (let [text (html/text song)
@@ -38,7 +42,7 @@
         (not (.startsWith url (str "/" artist))))))
 
 (def illegal-words
-  ["jwmt" "interview" "review"])
+  ["jwtm" "interview" "review"])
 
 (defn is-valid? [song]
   (let [text (string/lower-case (html/text song))]
@@ -56,7 +60,8 @@
     id))
 
 (defn find-songs [artist]
-  (let [artist-id (find-artist-id artist)]
+  (let [artist (:rap-genius-name artist)
+        artist-id (find-artist-id artist)]
     (loop [songs []
            page-number 1]
       (let [songs-url (artist-songs-url artist artist-id page-number)
@@ -65,7 +70,6 @@
             collab-songs (filter (partial is-collab? artist) songs-on-page)
             valid-songs (filter is-valid? collab-songs)
             extracted-songs (map extract-song valid-songs)]
-        ;(println songs-on-page)
         (if (empty? songs-on-page)
           songs
           (recur (concat songs extracted-songs)

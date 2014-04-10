@@ -1,0 +1,77 @@
+body {
+    font-family: 'Domine', serif;
+    margin: 50px auto;
+    width: 800px;
+}
+
+a, a:visited {
+   color: black;
+}
+
+.credit {
+    float: right;
+}
+
+.path {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.path .artist {
+    width: 200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.path .artist .artistImage {
+    width: 200px;
+    height: 200px;
+    border-radius: 100px;
+    background-position: 50% 10%;
+}
+
+.path .artistName {
+    font-size: 2em;
+    font-style: italic;
+    position: absolute;
+    top: 100px;
+    width: 300px;
+}
+
+.path .artist:nth-child(4n+1) .artistName {
+    left: 250px;
+}
+
+.path .artist:nth-child(4n+3) .artistName {
+    right: 150px;
+}
+
+.path .arrow {
+    border-style: solid;
+    border-color: black;
+    border-width: 0 2px;
+    height: 60px;
+    width: 0px;
+    margin: 20px auto;
+
+}
+
+.path .song {
+    text-align: center;
+}
+
+.path .songLink {
+    width: 50%;
+    margin: 0 auto;
+    font-style: italic;
+}
+
+.pathForm input {
+    width: 33%;
+    display: inline-block;
+    font-size: 2em;
+    padding: 10px;
+    font-family: 'Domine', serif;
+    font-style: italic;
+    border: 2px solid black;
+}
