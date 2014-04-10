@@ -13,7 +13,7 @@
         text (slurp url)
         data (json/read-str text)
         image-url (get-in data ["responseData" "results" 0 "url"])]
-    (response image-url)))
+    image-url))
 
 (defn add-images [path]
   (map (fn [step] (assoc step :from-artist-image (get-image (:from-artist step))
