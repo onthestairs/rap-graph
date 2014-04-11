@@ -60,6 +60,7 @@
     id))
 
 (defn find-songs [artist]
+  (println "YO")
   (let [artist (:rap-genius-name artist)
         artist-id (find-artist-id artist)]
     (loop [songs []

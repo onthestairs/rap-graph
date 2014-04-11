@@ -9,6 +9,7 @@
 (defroutes main-routes
   (GET "/path" [from-artist to-artist] (artist-path from-artist to-artist))
   (GET "/image" [artist] (get-image artist))
+  (GET "/artist-autocomplete" [query] (artist-autocomplete query))
   (route/resources "/")
   (route/not-found "Page not found"))
 

@@ -22,3 +22,14 @@
 
 (defn artist-path [from-artist to-artist]
   (response (add-images (graph/artist-path graph/graph from-artist to-artist))))
+
+
+(defn artist-autocomplete [str]
+  (let [lower-str (string/lower-case str)
+        matches (filter (fn [artist] (.contains (second artist) lower-str))
+                        graph/artists-lower)]
+    (response {:query str
+               :suggestions (map (fn [match]
+                                   {:value (first match)
+                                    :data (second match)})
+                                 matches)})))

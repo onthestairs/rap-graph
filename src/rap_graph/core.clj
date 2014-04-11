@@ -57,6 +57,7 @@
               (recur)))))
     @rg))
 
-(def save-graph [graph graph-file attrs-file]
+(defn save-graph [graph graph-file attrs-file]
   (spit graph-file (:adj graph))
   (spit attrs-file (:attrs graph)))
+

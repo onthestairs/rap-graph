@@ -6,6 +6,7 @@
     <link href='http://fonts.googleapis.com/css?family=Domine' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="style.css" media="screen">
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.2.7/jquery.devbridge-autocomplete.min.js"></script>
   </head>
   <body>
     <h1>Finding the rap game Kevin Bacon</h1>
@@ -25,9 +26,9 @@
     <p>Use the form below to find a path between two rappers</p>
 
     <form class="pathForm" action="" method="post">
-      <input type="text" name="fromArtist" placeholder="A$AP ROCKY" id="fromArtist">
-      <input type="text" name="toArtist" placeholder="IGGY AZALEA" id="toArtist">
-      <input type="submit" value="Go">
+      <input type="text" name="fromArtist artistInput" placeholder="A$AP ROCKY" id="fromArtist">
+      <input type="text" name="toArtist artistInput" placeholder="IGGY AZALEA" id="toArtist">
+      <input type="submit" value="Go" id="pathSubmit">
     </form>
 
     <div class="path">
